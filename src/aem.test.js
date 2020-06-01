@@ -1,4 +1,4 @@
-import { vertexSimilarity, edgeArray, loadData, toArray, loadAllFiles } from "./aem";
+import { vertexSimilarity, edgeSimilarity, edgeArray, loadData, toArray, loadAllFiles } from "./aem";
 import { expect } from 'chai';
 
 describe('Check how many same vertexes are in both solutions', () => {
@@ -39,7 +39,6 @@ describe('Check how many same vertexes are in both solutions', () => {
 });
 
 describe('Create edges array from vertex array', () => {
-
     it('Empty vertex array', () => {
         const expected = [];
         const actual = edgeArray([]);
@@ -61,6 +60,42 @@ describe('Create edges array from vertex array', () => {
         const expected = [new Set([1,2]),new Set([2,3]), new Set([3,7]), new Set([7,8]), new Set([8,1])];
         const actual = edgeArray(arr1);
         expect(actual).to.deep.equal(expected);
+    });
+});
+
+describe('Check edge similarity', () => {
+    const arr1 = [new Set([1,2]),new Set([2,3]), new Set([3,1])];
+    const arr2 =  [new Set([1,2]),new Set([3,2]), new Set([3,7]), new Set([7,8]), new Set([8,1])];
+
+    it('Both arrays are empty', () => {
+        const expected = 0;
+        const actual = edgeSimilarity([],[]);
+        expect(actual).to.equal(expected);
+    });
+    it('First array is empty', () => {
+        const expected = 0;
+        const actual = edgeSimilarity([],arr1);
+        expect(actual).to.equal(expected);
+    });
+    it('Second array is empty', () => {
+        const expected = 0;
+        const actual = edgeSimilarity(arr1,[]);
+        expect(actual).to.equal(expected);
+    });
+    it('Different arrays with few same elements', () => {
+        const expected = 2;
+        const actual = edgeSimilarity(arr1,arr2);
+        expect(actual).to.equal(expected);
+    });
+    it('In opposite - different arrays with few same elements', () => {
+        const expected = 2;
+        const actual = edgeSimilarity(arr2,arr1);
+        expect(actual).to.equal(expected);
+    });
+    it('Same arrays with same elements', () => {
+        const expected = arr1.length;
+        const actual = edgeSimilarity(arr1,arr1);
+        expect(actual).to.equal(expected);
     });
 });
 
@@ -96,3 +131,6 @@ describe('Load all data from files', () => {
         expect(actual[2][0]).to.be.an('array');
     });
 });
+
+
+

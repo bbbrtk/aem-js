@@ -1,7 +1,9 @@
 "use strict";
 const fs = require('fs');
+const _ = require("lodash");
+const path = 'data/';
 
-export const vertexSimilarity = function getVertexSimilarity(arr1, arr2){
+export const vertexSimilarity = function(arr1, arr2){
     let similarity = 0;
     arr1.forEach(element => {
         if (arr2.includes(element)) similarity++;
@@ -9,7 +11,7 @@ export const vertexSimilarity = function getVertexSimilarity(arr1, arr2){
     return similarity;
 }
 
-export const edgeArray = function createEdgeArray(arr1){
+export const edgeArray = function(arr1){
     let edges = [];
     arr1.forEach((elem, index) => {
         if (index == arr1.length-1) index = -1;
@@ -20,14 +22,23 @@ export const edgeArray = function createEdgeArray(arr1){
     return edges;
 }
 
+export const edgeSimilarity = function(arr1, arr2){
+    let similarity = 0;
+    arr1.forEach(elem1 => {
+        arr2.forEach(elem2 => {
+            if (_.isEqual(elem1, elem2)) similarity++;
+        });
+    });
+    return similarity;
+}
 
-export const loadData = function loadDataFromFile(filename){
+export const loadData = function(filename){
     if (fs.lstatSync(filename).isFile()) {
         return fs.readFileSync(filename, 'utf-8');
     }
 }
 
-export const toArray = function convertDataToArray(filename){
+export const toArray = function(filename){
     let buffer = loadData(filename);
     return [...buffer];
 }
@@ -66,10 +77,8 @@ function convertBufferToAnArray(content){
     return mainArr;
 }
 
-
-export const loadAllFiles = function loadDataFromAllFiles(){
+export const loadAllFiles = function(){
     let arr = [];
-    const path = 'data/';
     const lens = [
         'lensA.txt',
         'lensB.txt'
@@ -78,7 +87,6 @@ export const loadAllFiles = function loadDataFromAllFiles(){
         'pathsA.txt',
         'pathsB.txt'
     ];
-    
     lens.forEach(element => {
         let content = toArray(path + element);
         arr.push(convertBufferToNumberArray(content));
