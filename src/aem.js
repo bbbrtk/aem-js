@@ -98,3 +98,8 @@ export const loadAllFiles = function(){
     return arr;
 }
 
+export const findMaxAvg = function(arr){
+    let avg = _.reduce(arr, (sum, elem) => {return sum + elem}, 0) / arr.length;
+    let max = Math.max(...arr);
+    return [max, avg];
+}

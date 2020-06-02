@@ -1,4 +1,4 @@
-import { vertexSimilarity, edgeSimilarity, edgeArray, loadData, toArray, loadAllFiles } from "./aem";
+import { vertexSimilarity, edgeSimilarity, edgeArray, loadData, toArray, loadAllFiles, findMaxAvg } from "./aem";
 import { expect } from 'chai';
 
 describe('Check how many same vertexes are in both solutions', () => {
@@ -132,5 +132,20 @@ describe('Load all data from files', () => {
     });
 });
 
-
+describe('Count vertex similarity to max and avg', () => {
+    it('Find max and avg of lenghts array', () => {
+        const arr = [1,2,3,9,4,5];
+        const [actualMax, actualAvg] = findMaxAvg(arr);
+        expect(actualMax).to.equal(9);
+        expect(actualAvg).to.equal(4);
+    });
+    it('Create array of similarity to max', () => {
+        const actual = similarity();
+        expect(actual[2][0]).to.be.an('array');
+    });
+    it('Create array of similarity to avg', () => {
+        const actual = similarity();
+        expect(actual[2][0]).to.be.an('array');
+    });
+});
 
