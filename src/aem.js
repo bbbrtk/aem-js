@@ -1,6 +1,8 @@
 "use strict";
 const fs = require('fs');
 const _ = require("lodash");
+const plotly = require('plotly')("bartoszsobkowiak", "kVLzvjQKm8CvgUGuU9A2");
+
 const path = 'data/';
 
  const vertexSimilarity = function(arr1, arr2){
@@ -117,6 +119,9 @@ function convertBufferToAnArray(content){
             'similarity' : similarity/(paths.length-1)
         });
     });
+    similarities.sort((a, b) => {
+        return a.value - b.value;
+      });
     return similarities;
 }
 
@@ -129,31 +134,45 @@ function convertBufferToAnArray(content){
             'similarity' : func(elem1, best)
         });
     });
+    similarities.sort((a, b) => {
+        return a.value - b.value;
+      });
     return similarities;
 }
 
  const calcAllSimilarities = function(values, paths, best){
-    let vertexSim = calcAvgSimilarityToAll(values, paths, vertexSimilarity);
+    // let vertexSim = calcAvgSimilarityToAll(values, paths, vertexSimilarity);
+    let vertexSim = 0;
     let vertexSimBest = calcSimilarityToBest(values, paths, vertexSimilarity, best);
     let edges = [];
     paths.forEach(elem1 => {
         edges.push(edgeArray(elem1));
     });   
-    let edgeSim = calcAvgSimilarityToAll(values, edges, edgeSimilarity);
+    // let edgeSim = calcAvgSimilarityToAll(values, edges, edgeSimilarity);
+    let edgeSim = 0;
     let edgeSimBest = calcSimilarityToBest(values, edges, edgeSimilarity, edgeArray(best));
 
     return [vertexSim, vertexSimBest, edgeSim, edgeSimBest];
 }
 
 let arr = loadAllFiles();
-let best = [];
-let abc = calcSimilarityToBest(arr[0], arr[2], vertexSimilarity, arr[2][10]);
-// let [vertexSim, vertexSimBest, edgeSim, edgeSimBest] = calcAllSimilarities(arr[0], arr[2], best);
-console.log(abc.slice(0,10));
-console.log("vertexSimBest");
+let best = arr[2][0];
+let [vertexSim, vertexSimBest, edgeSim, edgeSimBest] = calcAllSimilarities(arr[0], arr[2], best);
 
-abc.sort((a, b) => {
-    return a.value - b.value;
-  });
+console.log(
+    "done"
+);
 
-console.log(abc)
+var data = [{
+    x: edgeSimBest.map(elem => elem.value),
+    y: edgeSimBest.map(elem => elem.similarity),
+    mode: "markers",
+    type: "scatter"
+}];
+
+var layout = {fileopt : "overwrite", filename : "vertexSimBest"};
+
+plotly.plot(data, layout, function (err, msg) {
+	if (err) return console.log(err);
+	console.log(msg);
+});
