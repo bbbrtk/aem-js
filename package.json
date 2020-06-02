@@ -4,7 +4,8 @@
   "description": "AEM tasks rewrited to JavaScript",
   "main": "aem.js",
   "scripts": {
-    "test": "npx mocha \"src/**/*.test.js\" --recursive --require @babel/register"
+    "test": "npx mocha \"src/**/*.test.js\" --recursive --require @babel/register",
+    "build": "node \"src/aem.js\""
   },
   "repository": {
     "type": "git",
@@ -18,6 +19,7 @@
   },
   "homepage": "https://github.com/bbbrtk/aem-js#readme",
   "devDependencies": {
+    "@babel/cli": "^7.0.0",
     "@babel/core": "^7.10.2",
     "@babel/preset-env": "^7.10.2",
     "@babel/register": "^7.10.1",
