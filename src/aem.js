@@ -147,11 +147,13 @@ function convertBufferToAnArray(content){
 
 let arr = loadAllFiles();
 let best = [];
-let abc = calcAvgSimilarityToAll(arr[0], arr[2], edgeSimilarity);
+let abc = calcAvgSimilarityToAll(arr[0], arr[2], edgeSimilarity, arr[2][10]);
 // let [vertexSim, vertexSimBest, edgeSim, edgeSimBest] = calcAllSimilarities(arr[0], arr[2], best);
 console.log(abc);
 console.log("vertexSimBest");
 
-// objs.sort(function(a, b){
-//     return a.last_nom > b.last_nom;
-//   });
+abc.sort(function(a, b){
+    return a.value > b.value;
+  });
+
+console.log(abc)
