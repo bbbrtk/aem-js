@@ -190,8 +190,8 @@ function convertBufferToAnArray(content){
     paths.forEach(elem1 => {
         edges.push(edgeArray(elem1));
     });   
-    // let edgeSim = calcAvgSimilarityToAll(values, edges, edgeSimilarity);
-    let edgeSim = [];
+    let edgeSim = calcAvgSimilarityToAll(values, edges, edgeSimilarity);
+    // let edgeSim = [];
     let edgeSimBest = calcSimilarityToBest(values, edges, edgeSimilarity, edgeArray(best));
 
     return [vertexSim, vertexSimBest, edgeSim, edgeSimBest];
@@ -220,8 +220,9 @@ let files = loadAllFiles();
     let arr = calcAllSimilarities(files[elem], files[elem+2], files[elem+2][bestIndex]);
     let names = ["vertexSim", "vertexSimBest", "edgeSim", "edgeSimBest"];
     arr.forEach((elem2, index) => {
-        // console.log(elem2);
-        // drawPlot(elem2, names[index]+elem.toString());
+        // plot
+        drawPlot(elem2, names[index]+elem.toString());
+        // corr
         let data = new Array(
             elem2.map(elem => elem.value),
             elem2.map(elem => elem.similarity)
