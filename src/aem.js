@@ -3,7 +3,49 @@ const fs = require('fs');
 const _ = require("lodash");
 const plotly = require('plotly')("bartoszsobkowiak", "kVLzvjQKm8CvgUGuU9A2");
 
+
 const path = 'data/';
+
+function pearsonCorrelation(prefs, p1, p2) {
+    var si = [];
+  
+    for (var key in prefs[p1]) {
+      if (prefs[p2][key]) si.push(key);
+    }
+  
+    var n = si.length;
+  
+    if (n == 0) return 0;
+  
+    var sum1 = 0;
+    for (var i = 0; i < si.length; i++) sum1 += prefs[p1][si[i]];
+  
+    var sum2 = 0;
+    for (var i = 0; i < si.length; i++) sum2 += prefs[p2][si[i]];
+  
+    var sum1Sq = 0;
+    for (var i = 0; i < si.length; i++) {
+      sum1Sq += Math.pow(prefs[p1][si[i]], 2);
+    }
+  
+    var sum2Sq = 0;
+    for (var i = 0; i < si.length; i++) {
+      sum2Sq += Math.pow(prefs[p2][si[i]], 2);
+    }
+  
+    var pSum = 0;
+    for (var i = 0; i < si.length; i++) {
+      pSum += prefs[p1][si[i]] * prefs[p2][si[i]];
+    }
+  
+    var num = pSum - (sum1 * sum2 / n);
+    var den = Math.sqrt((sum1Sq - Math.pow(sum1, 2) / n) *
+        (sum2Sq - Math.pow(sum2, 2) / n));
+  
+    if (den == 0) return 0;
+  
+    return num / den;
+  }
 
  const vertexSimilarity = function(arr1, arr2){
     let similarity = 0;
@@ -100,10 +142,10 @@ function convertBufferToAnArray(content){
     return arr;
 }
 
- const findMaxAvg = function(arr){
+ const findMinAvg = function(arr){
     let avg = _.reduce(arr, (sum, elem) => {return sum + elem}, 0) / arr.length;
-    let max = Math.max(...arr);
-    return [max, avg];
+    let min = Math.min(...arr);
+    return [min, avg];
 }
 
  const calcAvgSimilarityToAll = function(values, paths, func){
@@ -141,38 +183,54 @@ function convertBufferToAnArray(content){
 }
 
  const calcAllSimilarities = function(values, paths, best){
-    // let vertexSim = calcAvgSimilarityToAll(values, paths, vertexSimilarity);
-    let vertexSim = 0;
+    let vertexSim = calcAvgSimilarityToAll(values, paths, vertexSimilarity);
+    // let vertexSim = [];
     let vertexSimBest = calcSimilarityToBest(values, paths, vertexSimilarity, best);
     let edges = [];
     paths.forEach(elem1 => {
         edges.push(edgeArray(elem1));
     });   
     // let edgeSim = calcAvgSimilarityToAll(values, edges, edgeSimilarity);
-    let edgeSim = 0;
+    let edgeSim = [];
     let edgeSimBest = calcSimilarityToBest(values, edges, edgeSimilarity, edgeArray(best));
 
     return [vertexSim, vertexSimBest, edgeSim, edgeSimBest];
 }
 
-let arr = loadAllFiles();
-let best = arr[2][0];
-let [vertexSim, vertexSimBest, edgeSim, edgeSimBest] = calcAllSimilarities(arr[0], arr[2], best);
+const drawPlot = function(arr, name){
+    var data = [{
+        x: arr.map(elem => elem.value),
+        y: arr.map(elem => elem.similarity),
+        mode: "markers",
+        type: "scatter"
+    }];
+    
+    var layout = {fileopt : "overwrite", filename : name};
+    
+    plotly.plot(data, layout, function (err, msg) {
+        if (err) return console.log(err);
+        console.log(msg);
+    });
+}
 
-console.log(
-    "done"
-);
 
-var data = [{
-    x: edgeSimBest.map(elem => elem.value),
-    y: edgeSimBest.map(elem => elem.similarity),
-    mode: "markers",
-    type: "scatter"
-}];
+let files = loadAllFiles();
+[0, 1].forEach(elem => {
+    let bestIndex = files[elem].findIndex( x => x == findMinAvg(files[elem])[0] );
+    let arr = calcAllSimilarities(files[elem], files[elem+2], files[elem+2][bestIndex]);
+    let names = ["vertexSim", "vertexSimBest", "edgeSim", "edgeSimBest"];
+    arr.forEach((elem2, index) => {
+        // console.log(elem2);
+        // drawPlot(elem2, names[index]+elem.toString());
+        let data = new Array(
+            elem2.map(elem => elem.value),
+            elem2.map(elem => elem.similarity)
+            );
+        if (data.length > 0){
+            let corr = pearsonCorrelation(data,0,1);
+            console.log(corr);
+        } 
 
-var layout = {fileopt : "overwrite", filename : "vertexSimBest"};
-
-plotly.plot(data, layout, function (err, msg) {
-	if (err) return console.log(err);
-	console.log(msg);
+    });
 });
+
